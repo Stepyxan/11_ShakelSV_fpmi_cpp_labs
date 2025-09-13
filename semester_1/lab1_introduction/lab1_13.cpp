@@ -3,7 +3,10 @@
 int main()
 {
     int n;
-    std::cin >> n;
+    if (!(std::cin >> n) || n < 0) {
+        std::cout << "error";
+        std::exit(1);
+    }
     if (n == 0 || n == 1) {
         std::cout << n;
     }
