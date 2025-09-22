@@ -4,8 +4,12 @@ int main()
 {
     int n;
     std::cout << "Enter n: ";
-    if (!(std::cin >> n) || n < 1) {
+    if (!(std::cin >> n)) {
         std::cout << "Invalid input! Error!\n";
+        std::exit(1);
+    }
+    if (n < 1) {
+        std::cout << "n must be natural\n";
         std::exit(1);
     }
     for (int a = 1; a <= n; a++) {
@@ -17,4 +21,5 @@ int main()
             }
         }
     }
+    return 0;
 }
