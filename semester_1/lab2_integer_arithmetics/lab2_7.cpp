@@ -3,8 +3,9 @@
 int main()
 {
     int n;
+    std::cout << "Enter n: ";
     if (!(std::cin >> n) || n < 1) {
-        std::cout << "error";
+        std::cout << "Invalid input! Error!\n";
         std::exit(1);
     }
     for (int a = 1; a <= n; a++) {
@@ -12,7 +13,7 @@ int main()
             int c_sqr = a * a + b * b;
             int c = sqrt(c_sqr);
             if (c <= n && c * c == c_sqr) {
-                std::cout << a << ' ' << b << ' ' << c << '\n';
+                std::cout << "a = " << a << " b = " << b << " c = " << c << '\n';
             }
         }
     }
