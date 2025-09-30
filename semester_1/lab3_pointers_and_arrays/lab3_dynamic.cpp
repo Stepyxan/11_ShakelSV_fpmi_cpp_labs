@@ -21,12 +21,14 @@ int main() {
     char user_answer;
     if (!(std::cin >> user_answer) || !(user_answer == 'Y' || user_answer == 'n')) {
         std::cout << "Error! You should enter a char('Y' or 'n')";
+        delete[] arr;
         std::exit(1);
     }
     if (user_answer == 'Y') {
         for (int i = 0; i < n; i++) {
             if (!(std::cin >> arr[i])) {
                 std::cout << "Error! You should enter a real number";
+                delete[] arr;
                 std::exit(1);
             }
         }
@@ -36,6 +38,7 @@ int main() {
         double a, b;
         if (!(std::cin >> a >> b)) {
             std::cout << "Error! You should enter two real numbers";
+            delete[] arr;
             std::exit(1);
         }
         std::mt19937 gen(45218965);
