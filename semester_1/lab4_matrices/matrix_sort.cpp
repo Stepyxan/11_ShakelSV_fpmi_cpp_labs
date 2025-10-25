@@ -11,68 +11,13 @@ bool asc_comp(int, int);
 bool desc_comp(int, int);
 void allocate_matrix(int***, int, int);
 void random_input(int** matrix, int rows, int columns, int l_border, int r_border);
-void enter_rows_columns(int* rows, int* columns) {
-    while (!(std::cin >> *rows >> *columns) || *rows < 1 || *columns < 1) {
-        std::cout << "Try again. Enter natural numbers (rows/columns): \n";
-        clear_input();
-    }
-}
-void manual_matrix_input(int** matrix, int rows, int columns) {
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < columns; j++) {
-            while (!(std::cin >> matrix[i][j])) {
-                std::cout << "Try again. You should enter a real number:";
-                clear_input();
-            }
-        }
-    }
-}
-void random_matrix_input(int** matrix, int rows, int columns) {
-    std::cout << "Enter l_border and r_border for gen random numbers in [l_border, r_border]: ";
-    double l_border, r_border;
-    while (!(std::cin >> l_border >> r_border)) {
-        std::cout << "Try again. You should enter two real numbers: ";
-        clear_input();
-    }
-    random_input(matrix, rows, columns, l_border, r_border);
-}
-char enter_input_mode() {
-    char user_answer;
-    while (!(std::cin >> user_answer) || !(user_answer == 'y' || user_answer == 'n')) {
-        std::cout << "Try again. You should enter a char('y' or 'n'): \n";
-        clear_input();
-    }
-    return user_answer;
-}
-char enter_sort_order() {
-    char elems_order;
-    std::cout << "What order of elements do you want?\n";
-    std::cout << "Enter 'A'(Ascending), 'D'(Descending): ";
-    while (!(std::cin >> elems_order) || !(elems_order == 'D' || elems_order == 'A')) {
-        std::cout << "Try again. You should enter a char('A', 'D'): ";
-        clear_input();
-    }
-    return elems_order;
-}
-
-char enter_sort_mode() {
-    std::cout << "What sort type do you want to use?\n";
-    std::cout << "Enter 'B'(Bubble), 'I'(Insert) or 'M'(Merge): ";
-    char sort_mode;
-    while (!(std::cin >> sort_mode) || !(sort_mode == 'B' || sort_mode == 'I' || sort_mode == 'M')) {
-        std::cout << "Try again. You should enter a char('B', 'I', 'M'): ";
-        clear_input();
-    }
-    return sort_mode;
-}
-void matrix_output(int** matrix, int rows, int columns) {
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < columns; j++) {
-            std::cout << matrix[i][j] << ' ';
-        }
-        std::cout << '\n';
-    }
-}
+void enter_rows_columns(int* rows, int* columns);
+void manual_matrix_input(int** matrix, int rows, int columns);
+void random_matrix_input(int** matrix, int rows, int columns);
+char enter_input_mode();
+char enter_sort_order();
+char enter_sort_mode();
+void matrix_output(int** matrix, int rows, int columns);
 
 int main() {
     std::cout << "Enter 2 natural number (rows/columns): \n";
@@ -183,6 +128,13 @@ void bubble_sort(int* arr, int n, bool (*comp)(int, int)) {
     }
 }
 
+void enter_rows_columns(int* rows, int* columns) {
+    while (!(std::cin >> *rows >> *columns) || *rows < 1 || *columns < 1) {
+        std::cout << "Try again. Enter natural numbers (rows/columns): \n";
+        clear_input();
+    }
+}
+
 void dynamic_array_cleaning(int** arr, int n) {
     for (int i = 0; i < n; i++) {
         delete [] arr[i];
@@ -221,5 +173,66 @@ void random_input(int** matrix, int rows, int columns, int l_border, int r_borde
         for (int j = 0; j < columns; j++) {
             matrix[i][j] = dist(gen);
         }
+    }
+}
+
+void manual_matrix_input(int** matrix, int rows, int columns) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            while (!(std::cin >> matrix[i][j])) {
+                std::cout << "Try again. You should enter a real number:";
+                clear_input();
+            }
+        }
+    }
+}
+
+void random_matrix_input(int** matrix, int rows, int columns) {
+    std::cout << "Enter l_border and r_border for gen random numbers in [l_border, r_border]: ";
+    double l_border, r_border;
+    while (!(std::cin >> l_border >> r_border)) {
+        std::cout << "Try again. You should enter two real numbers: ";
+        clear_input();
+    }
+    random_input(matrix, rows, columns, l_border, r_border);
+}
+
+char enter_input_mode() {
+    char user_answer;
+    while (!(std::cin >> user_answer) || !(user_answer == 'y' || user_answer == 'n')) {
+        std::cout << "Try again. You should enter a char('y' or 'n'): \n";
+        clear_input();
+    }
+    return user_answer;
+}
+
+char enter_sort_order() {
+    char elems_order;
+    std::cout << "What order of elements do you want?\n";
+    std::cout << "Enter 'A'(Ascending), 'D'(Descending): ";
+    while (!(std::cin >> elems_order) || !(elems_order == 'D' || elems_order == 'A')) {
+        std::cout << "Try again. You should enter a char('A', 'D'): ";
+        clear_input();
+    }
+    return elems_order;
+}
+
+char enter_sort_mode() {
+    std::cout << "What sort type do you want to use?\n";
+    std::cout << "Enter 'B'(Bubble), 'I'(Insert) or 'M'(Merge): ";
+    char sort_mode;
+    while (!(std::cin >> sort_mode) || !(sort_mode == 'B' || sort_mode == 'I' || sort_mode == 'M')) {
+        std::cout << "Try again. You should enter a char('B', 'I', 'M'): ";
+        clear_input();
+    }
+    return sort_mode;
+}
+
+void matrix_output(int** matrix, int rows, int columns) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            std::cout << matrix[i][j] << ' ';
+        }
+        std::cout << '\n';
     }
 }
