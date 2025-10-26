@@ -41,7 +41,6 @@ int main() {
             comp = desc_comp;
             break;
     }
-
     switch (enter_sort_mode()) {
         case ('B'):
             for (int i = 0; i < rows; i++) {
@@ -62,6 +61,7 @@ int main() {
             break;
     }
     matrix_output(matrix, rows, columns);
+    dynamic_array_cleaning(matrix, rows);
 }
 
 void allocate_matrix(int*** matrix, int rows,  int columns) {
@@ -134,8 +134,8 @@ void enter_rows_columns(int* rows, int* columns) {
     }
 }
 
-void dynamic_array_cleaning(int** arr, int n) {
-    for (int i = 0; i < n; i++) {
+void dynamic_array_cleaning(int** arr, int rows) {
+    for (int i = 0; i < rows; i++) {
         delete [] arr[i];
     }
     delete [] arr;
