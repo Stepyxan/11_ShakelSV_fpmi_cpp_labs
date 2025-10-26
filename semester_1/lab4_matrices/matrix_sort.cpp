@@ -20,12 +20,10 @@ char enter_sort_mode();
 void matrix_output(int** matrix, int rows, int columns);
 
 int main() {
-    std::cout << "Enter 2 natural number (rows/columns): \n";
     int rows, columns;
     enter_rows_columns(&rows, &columns);
     int** matrix;
     allocate_matrix(&matrix, rows, columns);
-    std::cout << "Do you want to enter numbers from keyboard? y/n: ";
     switch (enter_input_mode()) {
         case ('y'):
             manual_matrix_input(matrix, rows, columns);
@@ -129,6 +127,7 @@ void bubble_sort(int* arr, int n, bool (*comp)(int, int)) {
 }
 
 void enter_rows_columns(int* rows, int* columns) {
+    std::cout << "Enter 2 natural number (rows/columns): \n";
     while (!(std::cin >> *rows >> *columns) || *rows < 1 || *columns < 1) {
         std::cout << "Try again. Enter natural numbers (rows/columns): \n";
         clear_input();
@@ -198,6 +197,7 @@ void random_matrix_input(int** matrix, int rows, int columns) {
 }
 
 char enter_input_mode() {
+    std::cout << "Do you want to enter numbers from keyboard? y/n: ";
     char user_answer;
     while (!(std::cin >> user_answer) || !(user_answer == 'y' || user_answer == 'n')) {
         std::cout << "Try again. You should enter a char('y' or 'n'): \n";
