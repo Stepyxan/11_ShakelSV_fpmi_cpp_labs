@@ -2,6 +2,7 @@
 #include <random>
 
 void clear_input();
+void selection_sort(int*, int, bool (*)(int, int));
 void merge(int *, int, int, int, int*, bool (*)(int, int));
 void merge_sort(int*, int, int, int*, bool (*)(int, int));
 void bubble_sort(int*, int, bool (*)(int, int));
@@ -52,6 +53,10 @@ int main() {
                 sort_insert_mod(matrix[i], columns, comp);
             }
             break;
+        case ('S'):
+            for (int i = 0; i < rows; i++) {
+                selection_sort(matrix[i], columns, comp);
+            }
         case ('M'):
             for (int i = 0; i < rows; i++) {
                 int* temp = new int[columns];
@@ -219,10 +224,10 @@ char enter_sort_order() {
 
 char enter_sort_mode() {
     std::cout << "What sort type do you want to use?\n";
-    std::cout << "Enter 'B'(Bubble), 'I'(Insert) or 'M'(Merge): ";
+    std::cout << "Enter 'B'(Bubble), 'I'(Insert), 'S'(Selection) or 'M'(Merge): ";
     char sort_mode;
-    while (!(std::cin >> sort_mode) || !(sort_mode == 'B' || sort_mode == 'I' || sort_mode == 'M')) {
-        std::cout << "Try again. You should enter a char('B', 'I', 'M'): ";
+    while (!(std::cin >> sort_mode) || !(sort_mode == 'B' || sort_mode == 'I' || sort_mode == 'M' || sort_mode == 'S')) {
+        std::cout << "Try again. You should enter a char('B', 'I', 'S', 'M'): ";
         clear_input();
     }
     return sort_mode;
@@ -234,5 +239,19 @@ void matrix_output(int** matrix, int rows, int columns) {
             std::cout << matrix[i][j] << ' ';
         }
         std::cout << '\n';
+    }
+}
+
+void selection_sort(int* arr, int n, bool (*comp)(int, int)) {
+    for (int i = 0; i < n - 1; i++) {
+        int cur_index = i;
+        for (int j = i + 1; j < n; j++) {
+            if (comp(arr[j], arr[cur_index])) {
+                cur_index = j;
+            }
+        }
+        if (cur_index != i) {
+            std::swap(arr[i], arr[cur_index]);
+        }
     }
 }
