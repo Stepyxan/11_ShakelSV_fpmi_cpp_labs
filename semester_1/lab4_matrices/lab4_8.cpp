@@ -1,37 +1,50 @@
 #include <iostream>
 #include <random>
 
-void clear_input();
+void dynamic_array_cleaning(int** matrix, int rows);
 int count_columns_without_elem(int** matrix, int elem, int rows, int columns);
 int define_row_number_with_longest_chain(int** matrix, int rows, int columns);
-void dynamic_array_cleaning(int**, int);
-void random_input(int** matrix, int rows, int columns, int l_border, int r_border);
+void random_input(std::mt19937& gen, int** matrix, int rows, int columns, int l_border, int r_border);
 void allocate_matrix(int*** matrix_pointer, int rows, int columns);
-void enter_rows_columns(int* rows, int* columns);
-char enter_input_mode();
+void enter_rows_columns(int& rows, int& columns);
+char enter_input_mode(int** matrix, int rows);
 void manual_matrix_input(int** matrix, int rows, int columns);
-void random_matrix_input(int** matrix, int rows, int columns);
+void random_matrix_input(std::mt19937& gen, int** matrix, int rows, int columns);
 void matrix_output(int** matrix, int rows, int columns);
 
 int main() {
     int rows, columns;
-    enter_rows_columns(&rows, &columns);
-    int** matrix;
-    allocate_matrix(&matrix, rows, columns);
-    switch (enter_input_mode()) {
-        case ('y'):
-            manual_matrix_input(matrix, rows, columns);
-            break;
-        case ('n'):
-            random_matrix_input(matrix, rows, columns);
-            break;
+    try {
+        enter_rows_columns(rows, columns);
+        int** matrix{};
+        allocate_matrix(&matrix, rows, columns);
+        switch (enter_input_mode(matrix, rows)) {
+            case 'y':
+            case 'Y': {
+                manual_matrix_input(matrix, rows, columns);
+                break;
+            }
+            case 'n':
+            case 'N': {
+                std::mt19937 gen(45218965);
+                random_matrix_input(gen, matrix, rows, columns);
+                break;
+            }
+            default: 
+                throw "Error. You must enter a char('y' or 'n')\n";
+
+        }
+        matrix_output(matrix, rows, columns);
+        std::cout << "Number of columns without a[1][1] value: ";
+        std::cout << count_columns_without_elem(matrix, matrix[1][1], rows, columns) << '\n';
+        std::cout << "Row with the longest chain of identical elements: ";
+        std::cout << define_row_number_with_longest_chain(matrix, rows, columns) << '\n';
+        dynamic_array_cleaning(matrix, rows);
     }
-    matrix_output(matrix, rows, columns);
-    std::cout << "Number of columns without a[1][1] value: ";
-    std::cout << count_columns_without_elem(matrix, matrix[1][1], rows, columns) << '\n';
-    std::cout << "Row with the longest chain of identical elements: ";
-    std::cout << define_row_number_with_longest_chain(matrix, rows, columns) << '\n';
-    dynamic_array_cleaning(matrix, rows);
+    catch(const char* msg){
+        std::cerr << msg;
+    }
+    return 0;
 }
 
 int count_columns_without_elem(int** matrix, int elem, int rows, int columns) {
@@ -90,8 +103,7 @@ void allocate_matrix(int*** matrix_pointer, int rows, int columns) {
     }
 }
 
-void random_input(int** matrix, int rows, int columns, int l_border, int r_border) {
-    std::mt19937 gen(45218965);
+void random_input(std::mt19937& gen, int** matrix, int rows, int columns, int l_border, int r_border) {
     std::uniform_real_distribution<double> dist(l_border, r_border);
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
@@ -100,45 +112,39 @@ void random_input(int** matrix, int rows, int columns, int l_border, int r_borde
     }
 }
 
-void clear_input() {
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-}
-
-void enter_rows_columns(int* rows, int* columns) {
+void enter_rows_columns(int& rows, int& columns) {
     std::cout << "Enter two natural numbers rows and columns: ";
-    while (!(std::cin >> *rows >> *columns) || *rows < 1 || *columns < 1) {
-        std::cout << "Try again. Enter natural numbers (rows/columns): \n";
-        clear_input();
+    if (!(std::cin >> rows >> columns) || rows < 1 || columns < 1) {
+        throw "Error. Rows and columns must be natural\n";
     }
 }
 
-char enter_input_mode() {
+char enter_input_mode(int** matrix, int rows) {
     std::cout << "Do you want to enter numbers from keyboard? y/n: ";
     char user_answer;
-    while (!(std::cin >> user_answer) || !(user_answer == 'y' || user_answer == 'n')) {
-        std::cout << "Try again. You should enter a char('y' or 'n'): \n";
-        clear_input();
+    if (!(std::cin >> user_answer)) {
+        dynamic_array_cleaning(matrix, rows);
+        throw "Error. Your answer must be a char\n";
     }
     return user_answer;
 }
 
-void random_matrix_input(int** matrix, int rows, int columns) {
+void random_matrix_input(std::mt19937& gen, int** matrix, int rows, int columns) {
     std::cout << "Enter l_border and r_border for gen random numbers in [l_border, r_border]: ";
     double l_border, r_border;
-    while (!(std::cin >> l_border >> r_border)) {
-        std::cout << "Try again. You should enter two real numbers: ";
-        clear_input();
+    if (!(std::cin >> l_border >> r_border)) {
+        dynamic_array_cleaning(matrix, rows);
+        throw "Error. l_border and r_border must be real!";
     }
-    random_input(matrix, rows, columns, l_border, r_border);
+    random_input(gen, matrix, rows, columns, l_border, r_border);
 }
 
 void manual_matrix_input(int** matrix, int rows, int columns) {
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
-            while (!(std::cin >> matrix[i][j])) {
-                std::cout << "Try again. You should enter a real number:";
-                clear_input();
+            if (!(std::cin >> matrix[i][j])) {
+                dynamic_array_cleaning(matrix, rows);
+                throw "Error. matrix elements must be integers";
             }
         }
     }
