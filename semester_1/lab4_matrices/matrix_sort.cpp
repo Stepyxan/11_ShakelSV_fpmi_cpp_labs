@@ -1,72 +1,93 @@
 #include <iostream>
 #include <random>
 
-void clear_input();
 void selection_sort(int*, int, bool (*)(int, int));
 void merge(int *, int, int, int, int*, bool (*)(int, int));
 void merge_sort(int*, int, int, int*, bool (*)(int, int));
+void merge_sort_runner(int*, int, bool (*)(int, int));
 void bubble_sort(int*, int, bool (*)(int, int));
 void dynamic_array_cleaning(int**, int);
 void sort_insert_mod(int*, int, bool (*)(int, int));
 bool asc_comp(int, int);
 bool desc_comp(int, int);
 void allocate_matrix(int***, int, int);
-void random_input(int** matrix, int rows, int columns, int l_border, int r_border);
-void enter_rows_columns(int* rows, int* columns);
+void random_input(std::mt19937& gen, int** matrix, int rows, int columns, int l_border, int r_border);
+void enter_rows_columns(int& rows, int& columns);
 void manual_matrix_input(int** matrix, int rows, int columns);
-void random_matrix_input(int** matrix, int rows, int columns);
-char enter_input_mode();
-char enter_sort_order();
-char enter_sort_mode();
+void random_matrix_input(std::mt19937& gen, int** matrix, int rows, int columns);
+char enter_input_mode(int** matrix, int rows);
+char enter_sort_order(int** matrix, int rows);
+char enter_sort_mode(int** matrix, int rows);
 void matrix_output(int** matrix, int rows, int columns);
 
 int main() {
-    int rows, columns;
-    enter_rows_columns(&rows, &columns);
-    int** matrix;
-    allocate_matrix(&matrix, rows, columns);
-    switch (enter_input_mode()) {
-        case ('y'):
-            manual_matrix_input(matrix, rows, columns);
-            break;
-        case ('n'):
-            random_matrix_input(matrix, rows, columns);
-            break;
+    try {
+        int rows, columns;
+        enter_rows_columns(rows, columns);
+        int** matrix;
+        allocate_matrix(&matrix, rows, columns);
+        switch (enter_input_mode(matrix, rows)) {
+            case 'y':
+            case 'Y': {
+                manual_matrix_input(matrix, rows, columns);
+                break;
+            }
+            case 'n':
+            case 'N': {
+                std::mt19937 gen(45218965);
+                random_matrix_input(gen, matrix, rows, columns);
+                break;
+            }
+            default: {
+                dynamic_array_cleaning(matrix, rows);
+                throw "Error. You must enter a char('y' or 'n')\n";
+            }
+        }
+        std::cout << "Your basic matrix:\n";
+        matrix_output(matrix, rows, columns);
+        bool (*comp)(int, int){};
+        switch (enter_sort_order(matrix, rows)) {
+            case 'A':
+            case 'a':
+                comp = asc_comp;
+                break;
+            case 'D':
+            case 'd':
+                comp = desc_comp;
+                break;
+            default: {
+                dynamic_array_cleaning(matrix, rows);
+                throw "Error. You must enter a char('A' or 'D')";
+            }
+        }
+        void (*sort_func)(int*, int, bool (*)(int, int)){};
+        switch (enter_sort_mode(matrix, rows)) {
+            case 'B':
+                sort_func = bubble_sort;
+                break;
+            case 'I':
+                sort_func = sort_insert_mod;
+                break;
+            case 'S':
+                sort_func = selection_sort;
+            case 'M':
+                sort_func = merge_sort_runner;
+                break;
+            default: {
+                dynamic_array_cleaning(matrix, rows);
+                throw "Error. You must enter a char('B', 'I', 'S' or 'M')\n";
+            }
+        }
+        for (int i = 0; i < rows; i++) {
+            sort_func(matrix[i], columns, comp);
+        }
+        std::cout << "Result matrix:\n";
+        matrix_output(matrix, rows, columns);
+        dynamic_array_cleaning(matrix, rows);
     }
-    bool (*comp)(int, int);
-    switch (enter_sort_order()) {
-        case ('A'):
-            comp = asc_comp;
-            break;
-        case ('D'):
-            comp = desc_comp;
-            break;
+    catch (const char* msg) {
+        std::cerr << msg << '\n';
     }
-    switch (enter_sort_mode()) {
-        case ('B'):
-            for (int i = 0; i < rows; i++) {
-                bubble_sort(matrix[i], columns, comp);
-            }
-            break;
-        case ('I'):
-            for (int i = 0; i < rows; i++) {
-                sort_insert_mod(matrix[i], columns, comp);
-            }
-            break;
-        case ('S'):
-            for (int i = 0; i < rows; i++) {
-                selection_sort(matrix[i], columns, comp);
-            }
-        case ('M'):
-            for (int i = 0; i < rows; i++) {
-                int* temp = new int[columns];
-                merge_sort(matrix[i], 0, columns, temp, comp);
-                delete [] temp;
-            }
-            break;
-    }
-    matrix_output(matrix, rows, columns);
-    dynamic_array_cleaning(matrix, rows);
 }
 
 void allocate_matrix(int*** matrix, int rows,  int columns) {
@@ -131,11 +152,10 @@ void bubble_sort(int* arr, int n, bool (*comp)(int, int)) {
     }
 }
 
-void enter_rows_columns(int* rows, int* columns) {
-    std::cout << "Enter 2 natural number (rows/columns): \n";
-    while (!(std::cin >> *rows >> *columns) || *rows < 1 || *columns < 1) {
-        std::cout << "Try again. Enter natural numbers (rows/columns): \n";
-        clear_input();
+void enter_rows_columns(int& rows, int& columns) {
+    std::cout << "Enter two natural numbers rows and columns: ";
+    if (!(std::cin >> rows >> columns) || rows < 1 || columns < 1) {
+        throw "Error. Rows and columns must be natural\n";
     }
 }
 
@@ -165,13 +185,7 @@ bool desc_comp(int first, int last) {
     return first > last;
 }
 
-void clear_input() {
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-}
-
-void random_input(int** matrix, int rows, int columns, int l_border, int r_border) {
-    std::mt19937 gen(45218965);
+void random_input(std::mt19937& gen, int** matrix, int rows, int columns, int l_border, int r_border) {
     std::uniform_real_distribution<double> dist(l_border, r_border);
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
@@ -183,52 +197,52 @@ void random_input(int** matrix, int rows, int columns, int l_border, int r_borde
 void manual_matrix_input(int** matrix, int rows, int columns) {
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
-            while (!(std::cin >> matrix[i][j])) {
-                std::cout << "Try again. You should enter a real number:";
-                clear_input();
+            if (!(std::cin >> matrix[i][j])) {
+                dynamic_array_cleaning(matrix, rows);
+                throw "Error. matrix elements must be integers";
             }
         }
     }
 }
 
-void random_matrix_input(int** matrix, int rows, int columns) {
+void random_matrix_input(std::mt19937& gen, int** matrix, int rows, int columns) {
     std::cout << "Enter l_border and r_border for gen random numbers in [l_border, r_border]: ";
     double l_border, r_border;
-    while (!(std::cin >> l_border >> r_border)) {
-        std::cout << "Try again. You should enter two real numbers: ";
-        clear_input();
+    if (!(std::cin >> l_border >> r_border)) {
+        dynamic_array_cleaning(matrix, rows);
+        throw "Error. l_border and r_border must be real!";
     }
-    random_input(matrix, rows, columns, l_border, r_border);
+    random_input(gen, matrix, rows, columns, l_border, r_border);
 }
 
-char enter_input_mode() {
+char enter_input_mode(int** matrix, int rows) {
     std::cout << "Do you want to enter numbers from keyboard? y/n: ";
     char user_answer;
-    while (!(std::cin >> user_answer) || !(user_answer == 'y' || user_answer == 'n')) {
-        std::cout << "Try again. You should enter a char('y' or 'n'): \n";
-        clear_input();
+    if (!(std::cin >> user_answer)) {
+        dynamic_array_cleaning(matrix, rows);
+        throw "Error. Your answer must be a char\n";
     }
     return user_answer;
 }
 
-char enter_sort_order() {
+char enter_sort_order(int** matrix, int rows) {
     char elems_order;
     std::cout << "What order of elements do you want?\n";
     std::cout << "Enter 'A'(Ascending), 'D'(Descending): ";
-    while (!(std::cin >> elems_order) || !(elems_order == 'D' || elems_order == 'A')) {
-        std::cout << "Try again. You should enter a char('A', 'D'): ";
-        clear_input();
+    if (!(std::cin >> elems_order)) {
+        dynamic_array_cleaning(matrix, rows);
+        throw "Error. Your answer about sort order must be a char";
     }
     return elems_order;
 }
 
-char enter_sort_mode() {
+char enter_sort_mode(int** matrix, int rows) {
     std::cout << "What sort type do you want to use?\n";
     std::cout << "Enter 'B'(Bubble), 'I'(Insert), 'S'(Selection) or 'M'(Merge): ";
     char sort_mode;
-    while (!(std::cin >> sort_mode) || !(sort_mode == 'B' || sort_mode == 'I' || sort_mode == 'M' || sort_mode == 'S')) {
-        std::cout << "Try again. You should enter a char('B', 'I', 'S', 'M'): ";
-        clear_input();
+    if (!(std::cin >> sort_mode)) {
+        dynamic_array_cleaning(matrix, rows);
+        throw "Error. Your answer about sort mode must be a char";
     }
     return sort_mode;
 }
@@ -254,4 +268,10 @@ void selection_sort(int* arr, int n, bool (*comp)(int, int)) {
             std::swap(arr[i], arr[cur_index]);
         }
     }
+}
+
+void merge_sort_runner(int* arr, int columns, bool (*comp)(int, int)) {
+    int* temp = new int[columns];
+    merge_sort(arr, 0, columns, temp, comp);
+    delete[] temp;
 }
