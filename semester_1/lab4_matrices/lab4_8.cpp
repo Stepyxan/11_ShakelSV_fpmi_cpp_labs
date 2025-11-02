@@ -30,9 +30,10 @@ int main() {
                 random_matrix_input(gen, matrix, rows, columns);
                 break;
             }
-            default: 
+            default: {
+                dynamic_array_cleaning(matrix, rows);
                 throw "Error. You must enter a char('y' or 'n')\n";
-
+            }
         }
         matrix_output(matrix, rows, columns);
         std::cout << "Number of columns without a[1][1] value: ";
