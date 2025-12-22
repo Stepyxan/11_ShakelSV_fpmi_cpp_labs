@@ -1,0 +1,24 @@
+101
+War and Peace
+1869
+Tolstoy Leo Nikolaevich
+
+102
+Pride and Prejudice
+1813
+Austen Jane
+
+103
+Crime and Punishment
+1866
+Dostoevsky Fyodor Mikhailovich
+
+104
+The Great Gatsby
+1925
+Fitzgerald Francis Scott
+
+105
+Hamlet
+1603
+Shakespeare William
