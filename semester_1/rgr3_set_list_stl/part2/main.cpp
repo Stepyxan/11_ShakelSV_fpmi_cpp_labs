@@ -93,7 +93,7 @@ public:
     }
 
     void SearchBookByAuthor(const Author& author) const {
-        std::cout << "Books from author " << author .last_name_ << " :\n";
+        std::cout << "Books from author " << author.last_name_ << " :\n";
         for (const Book& book : books) {
             if (std::find(book.authors_.begin(), book.authors_.end(), author) != book.authors_.end()) {
                 book.PrintBook();
@@ -113,21 +113,9 @@ public:
 };
 
 
-void InputCheck(std::ifstream& fin) {
-    if (!fin.is_open()) {
-        throw "Error: Cannot open input file\n";
-    }
-    if (fin.peek() == EOF) {
-        throw "Error: Input file is empty\n";
-    }
-}
-
-Author StringToAuthor(const std::string line) {
-    std::istringstream iss(line);
-    Author author;
-    iss >> author.last_name_ >> author.first_name_ >> author.patronymic_;
-    return author;
-}
+void InputCheck(std::ifstream& fin);
+Author StringToAuthor(const std::string line);
+void ReadDataFromFileToLib(Library& lib, std::ifstream& fin);
 
 
 int main() {
@@ -141,30 +129,7 @@ int main() {
     }
 
     Library lib;
-    std::string line;
-    while (std::getline(fin, line)) {
-        if (line.empty()) {
-            continue;
-        }
-        Book new_book;
-        new_book.udc_ = std::stoi(line);
-        if (!std::getline(fin, new_book.title_)) {
-            break;
-        }
-        if (!std::getline(fin, line)) {
-            break;
-        }
-        new_book.year_ = std::stoi(line);
-        while (std::getline(fin, line)) {
-            if (line.empty()) {
-                break;
-            }
-            Author author = StringToAuthor(line);
-            new_book.authors_.push_back(author);
-        }
-        new_book.authors_.sort();
-        lib.AddBook(new_book);
-    } 
+    ReadDataFromFileToLib(lib, fin);
     std::cout << "Your lib after file reading:\n";
     lib.PrintAllBooks();
 
@@ -194,4 +159,47 @@ int main() {
     std::cout << "Library after New book deleting:\n";
     lib.DeleteBookByTitle("New Book"); 
     lib.PrintAllBooks();
+}
+
+void InputCheck(std::ifstream& fin) {
+    if (!fin.is_open()) {
+        throw "Error: Cannot open input file\n";
+    }
+    if (fin.peek() == EOF) {
+        throw "Error: Input file is empty\n";
+    }
+}
+
+Author StringToAuthor(const std::string line) {
+    std::istringstream iss(line);
+    Author author;
+    iss >> author.last_name_ >> author.first_name_ >> author.patronymic_;
+    return author;
+}
+
+void ReadDataFromFileToLib(Library& lib, std::ifstream& fin) {
+    std::string line;
+    while (std::getline(fin, line)) {
+        if (line.empty()) {
+            continue;
+        }
+        Book new_book;
+        new_book.udc_ = std::stoi(line);
+        if (!std::getline(fin, new_book.title_)) {
+            break;
+        }
+        if (!std::getline(fin, line)) {
+            break;
+        }
+        new_book.year_ = std::stoi(line);
+        while (std::getline(fin, line)) {
+            if (line.empty()) {
+                break;
+            }
+            Author author = StringToAuthor(line);
+            new_book.authors_.push_back(author);
+        }
+        new_book.authors_.sort();
+        lib.AddBook(new_book);
+    } 
 }
