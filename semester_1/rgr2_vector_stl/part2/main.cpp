@@ -5,13 +5,15 @@
 #include <algorithm>
 #include <vector>
 
+TrainType StringToTrainType(const std::string& line);
+std::string TrainTypeToString(TrainType type);
 void InputCheck(std::ifstream& fin);
 void PrintTrain(const Train& train);
 std::vector<Train> ReadTrains(std::ifstream& fin);
 void PrintSortedByDispatch(std::vector<Train>& trains);
 void PrintTrainsInRange(const std::vector<Train>& trains, std::time_t t1, std::time_t t2);
 void PrintTrainsToDestination(const std::vector<Train>& trains, const std::string& dest);
-void PrintTrainsByTypeAndDestination(const std::vector<Train>& trains, int type_int, const std::string& dest);
+void PrintTrainsByTypeAndDestination(const std::vector<Train>& trains, TrainType type, const std::string& dest);
 void PrintFastestTrainToDestination(std::vector<Train>& trains, const std::string& dest);
 
 int main() {
@@ -44,15 +46,16 @@ int main() {
     std::cout << "Trains to " << dest1 << ":\n";
     PrintTrainsToDestination(trains, dest1);
 
-    int type_int = 0;
-    std::cout << "Trains of type " << type_int << " to " << dest1 << ":\n";
-    PrintTrainsByTypeAndDestination(trains, type_int, dest1);
+    TrainType type = TrainType::PASSENGER;
+    std::cout << "Trains of type " << TrainTypeToString(type) << " to " << dest1 << ":\n";
+    PrintTrainsByTypeAndDestination(trains, type, dest1);
 
     std::cout << "Fastest train to " << dest1 << ":\n";
     PrintFastestTrainToDestination(trains, dest1);
 
     return EXIT_SUCCESS;
 }
+
 
 void InputCheck(std::ifstream& fin) {
     if (!fin.is_open()) {
@@ -65,26 +68,25 @@ void InputCheck(std::ifstream& fin) {
 
 void PrintTrain(const Train& train) {
     std::cout << "Train: #" << train.getId()
-            << " Type: " << static_cast<int>(train.getType())
+            << " Type: " << TrainTypeToString(train.getType())
             << " Destination: " << train.getDestination()
             << " Dispatch: ";
     PrintTime(train.getDispatchTime());
     std::cout << " Travelling time: ";
     PrintTime(train.getTravellingTime());
-    std::cout << '\n';
 }
 
 std::vector<Train> ReadTrains(std::ifstream& fin) {
     using namespace time_utility;
     std::vector<Train> trains;
-    TrainId id; int type; std::string dest;
+    TrainId id; std::string type_str; std::string dest;
     size_t disp_h, disp_m, trav_h, trav_m;
 
-    while (fin >> id >> type >> dest >> disp_h >> disp_m >> trav_h >> trav_m) {
+    while (fin >> id >> type_str >> dest >> disp_h >> disp_m >> trav_h >> trav_m) {
         try {
             std::time_t dispatch_time = SetTime(disp_h, disp_m);
             std::time_t travelling_time = SetTime(trav_h, trav_m);
-            trains.emplace_back(id, TrainType(type), dest, dispatch_time, travelling_time);
+            trains.emplace_back(id, StringToTrainType(type_str), dest, dispatch_time, travelling_time);
         }
         catch (const std::out_of_range& error) {
             std::cerr << "Error: " << error.what() << '\n';
@@ -99,6 +101,7 @@ void PrintSortedByDispatch(std::vector<Train>& trains) {
     for (const Train& train : trains) {
         PrintTrain(train);
     }
+    std::cout << '\n';
 }
 
 void PrintTrainsInRange(const std::vector<Train>& trains, std::time_t t1, std::time_t t2) {
@@ -107,6 +110,7 @@ void PrintTrainsInRange(const std::vector<Train>& trains, std::time_t t1, std::t
             PrintTrain(train);
         }
     }
+    std::cout << '\n';
 }
 
 void PrintTrainsToDestination(const std::vector<Train>& trains, const std::string& dest) {
@@ -115,14 +119,16 @@ void PrintTrainsToDestination(const std::vector<Train>& trains, const std::strin
             PrintTrain(train);
         }
     }
+    std::cout << '\n';
 }
 
-void PrintTrainsByTypeAndDestination(const std::vector<Train>& trains, int type_int, const std::string& dest) {
+void PrintTrainsByTypeAndDestination(const std::vector<Train>& trains, TrainType type, const std::string& dest) {
     for (const Train& train : trains) {
-        if (train.getType() == TrainType(type_int) && train.getDestination() == dest) {
+        if (train.getType() == type && train.getDestination() == dest) {
             PrintTrain(train);
         }
     }
+    std::cout << '\n';
 }
 
 void PrintFastestTrainToDestination(std::vector<Train>& trains, const std::string& dest) {
@@ -139,4 +145,44 @@ void PrintFastestTrainToDestination(std::vector<Train>& trains, const std::strin
     } else {
         std::cout << "No trains found to " << dest << "\n";
     }
+    std::cout << '\n';
 }
+
+TrainType StringToTrainType(const std::string& line) {
+    if (line == "PASSENGER") {
+        return TrainType::PASSENGER;
+    }
+    if (line == "FREIGHT") {
+        return TrainType::FREIGHT;
+    } 
+    if (line == "HIGH_SPEED") {
+        return TrainType::HIGH_SPEED;
+    }
+    if (line == "SUBWAY") {
+        return TrainType::SUBWAY;
+    }
+    if (line == "SPECIALIZED") {
+        return TrainType::SPECIALIZED;
+    } 
+    throw std::out_of_range("Incorrect TrainType: " + line);
+}
+
+std::string TrainTypeToString(TrainType type) {
+    if (type == TrainType::PASSENGER) {
+        return "PASSENGER";
+    }
+    if (type == TrainType::FREIGHT) {
+        return "FREIGHT";
+    }
+    if (type == TrainType::HIGH_SPEED) {
+        return "HIGH_SPEED";
+    }
+    if (type == TrainType::SUBWAY) {
+        return "SUBWAY";
+    }
+    if (type == TrainType::SPECIALIZED) {
+        return "SPECIALIZED";
+    }
+    return "UNKNOWN";
+}
+

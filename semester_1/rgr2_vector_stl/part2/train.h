@@ -21,7 +21,8 @@ private:
     std::time_t travelling_time_;
 
 public:
-    Train() = default;
+    Train() : id_(0), type_(TrainType::PASSENGER), destination_(""),
+        dispatch_time_(0), travelling_time_(0) {}
 
     Train(TrainId id, TrainType type, const std::string& destination,
             std::time_t dispatch_time, std::time_t travelling_time)
