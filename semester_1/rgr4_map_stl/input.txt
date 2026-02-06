@@ -1,0 +1,6 @@
+Ivanov_I.I. 1001 Math 8 Physics 7 Programming 9
+Petrov_P.P. 1005 Math 5 Physics 6 Programming 4 English 3 Chemistry 5
+Sidorov_S.S. 1002 Math 9 Physics 8 Programming 10 English 9
+Kuznetsova_A.V. 1004 Math 7 Physics 7 Programming 8 English 6 History 7
+Smirnov_D.S. 1003 Math 2 Physics 3 Programming 4
+Novikova_E.A. 1006 Math 10 Physics 9 Programming 10 English 8 Chemistry 10 Biology 9
